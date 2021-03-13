@@ -11,8 +11,12 @@ module.exports = {
   // coisas sobre objetos derivados do request e response
   // request: (https://koajs.com/#request)
   // response: (https://koajs.com/#response)
-  populate: (ctx) => {
+  populate: async (ctx) => {
     console.log('Starting to populate...');
+
+    //chamando o servico populate criado dentro de game
+    await strapi.services.game.populate()
+
     ctx.send("Finished populating!");
   },
 };

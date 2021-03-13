@@ -5,4 +5,17 @@
  * to customize this service
  */
 
-module.exports = {};
+const axios = require('axios');
+
+module.exports = {
+  populate: async (params) => {
+    console.log('Chamando o serviço populate');
+    const gogApiUrl = `https://www.gog.com/games/ajax/filtered?mediaType=game&page=1&sort=popularity`;
+
+    const {
+      data: { products },
+    } = await axios.get(gogApiUrl);
+
+    console.log(products)
+  },
+};
