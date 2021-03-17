@@ -23,6 +23,55 @@ async function getGameInfo(slug) {
   };
 }
 
+async function getByName(name, entityName) {
+  const item = await strapi.services[entityName].find({ name });
+
+  return item.length ? item[0] : null;
+}
+
+async function create(name, entityName) {
+  const item = await getByName(name, entityName);
+
+  if (!item) {
+    const currentName = name.toLowerCase().replace(/[^a-zA-Z0-9 ]/, '');
+    return await strapi.services[entityName].create({
+      name,
+      slug:String(currentName).trim(),
+    });
+  }
+}
+
+async function createManyToManyData(products) {
+  const developers = {};
+  const publishers = {};
+  const categories = {};
+  const platforms = {};
+
+  products.forEach((product) => {
+    const { developer, publisher, genres, supportedOperatingSystems } = product;
+
+    genres &&
+      genres.forEach((item) => {
+        categories[item] = true;
+      });
+
+    supportedOperatingSystems &&
+      supportedOperatingSystems.forEach((item) => {
+        platforms[item] = true;
+      });
+
+    developers[developer] = true;
+    publishers[publisher] = true;
+  });
+
+  return Promise.all([
+    ...Object.keys(developers).map((name) => create(name, 'developer')),
+    ...Object.keys(publishers).map((name) => create(name, 'publisher')),
+    ...Object.keys(categories).map((name) => create(name, 'category')),
+    ...Object.keys(platforms).map((name) => create(name, 'platform')),
+  ]);
+}
+
 module.exports = {
   populate: async (params) => {
     console.log('Chamando o serviço populate');
@@ -32,15 +81,16 @@ module.exports = {
       data: { products },
     } = await axios.get(gogApiUrl);
 
-    await strapi.services.publisher.create({
-      name: products[0].publisher,
-      slug: slugify(products[0].publisher).toLowerCase(),
-    });
+    await createManyToManyData(products);
+    // await strapi.services.publisher.create({
+    //   name: products[0].publisher,
+    //   slug: slugify(products[0].publisher).toLowerCase(),
+    // });
 
-    await strapi.services.developer.create({
-      name: products[0].developer,
-      slug: slugify(products[0].developer).toLowerCase(),
-    });
+    // await strapi.services.developer.create({
+    //   name: products[0].developer,
+    //   slug: slugify(products[0].developer).toLowerCase(),
+    // });
 
     console.log(products);
   },
