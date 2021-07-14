@@ -1,0 +1,6 @@
+/app/node_modules
+/app/npm-debug.log
+/app/Dockerfile
+.dockerignore
+/app/.git
+/app/.gitignore
