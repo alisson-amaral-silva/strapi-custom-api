@@ -1,0 +1,20 @@
+{
+  "kind": "singleType",
+  "collectionName": "carts",
+  "info": {
+    "name": "cart",
+    "description": ""
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "cart": {
+      "type": "component",
+      "repeatable": false,
+      "component": "page.popular-games"
+    }
+  }
+}
