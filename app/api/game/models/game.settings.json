@@ -83,6 +83,10 @@
     "publisher": {
       "model": "publisher",
       "via": "games"
+    },
+    "wishlist": {
+      "via": "games",
+      "model": "wishlist"
     }
   }
 }
