@@ -31,12 +31,18 @@ module.exports = {
       };
     }
 
-    //iteração sobre o array, permitindo um parametro de acumulador =>
+    //reduce = iteração sobre o array, permitindo um parametro de acumulador =>
     // para somar e uma variavel a ser utilizada
     //o zero no final é o valor inicial
     const total = games.reduce((acc, game) => {
       return acc + game.price;
     }, 0);
+
+    if(total === 0 ){
+      return {
+        freeGames: true,
+      };
+    }
 
     return { total_in_cents: total * 100, games };
   },
