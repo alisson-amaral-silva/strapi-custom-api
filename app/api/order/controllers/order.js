@@ -6,8 +6,26 @@
  */
 
 module.exports = {
-  createPaymentIntent: () => {
-    return "Whatever";
+  createPaymentIntent: async (ctx) => {
+    const { cart } = ctx.request.body;
+
+    let games = [];
+
+    await Promise.all(
+      cart?.map(async (game) => {
+        //recuperando dados de outros serviços no strapi
+        const validGame = await strapi.services.game.findOne({
+          id: game.id
+        });
+
+        if (validGame) {
+          games.push(validGame);
+        }
+
+      })
+    );
+
+    return games;
   }
 
 };
