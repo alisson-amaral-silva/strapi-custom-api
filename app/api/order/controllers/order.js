@@ -1,7 +1,6 @@
-'use strict'
+"use strict";
 
-const stripe = require('stripe')(process.env.STRIPE_KEY);
-
+const stripe = require("stripe")(process.env.STRIPE_KEY);
 
 module.exports = {
   createPaymentIntent: async (ctx) => {
@@ -10,14 +9,13 @@ module.exports = {
     let games = [];
 
     await Promise.all(
-      cart?.map(async (game) => {
-        //recuperando dados de outros serviços no strapi
-        const validGame = await strapi.services.game.findOne({
+      cart.map(async (game) => {
+        const validatedGame = await strapi.services.game.findOne({
           id: game.id,
         });
 
-        if (validGame) {
-          games.push(validGame);
+        if (validatedGame) {
+          games.push(validatedGame);
         }
       })
     );
@@ -25,13 +23,10 @@ module.exports = {
     if (!games.length) {
       ctx.response.status = 404;
       return {
-        error: 'No valid games found!',
+        error: "No valid games found!",
       };
     }
 
-    //reduce = iteração sobre o array, permitindo um parametro de acumulador =>
-    // para somar e uma variavel a ser utilizada
-    //o zero no final é o valor inicial
     const total = games.reduce((acc, game) => {
       return acc + game.price;
     }, 0);
