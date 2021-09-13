@@ -1,24 +1,18 @@
 "use strict";
 
 const stripe = require("stripe")(process.env.STRIPE_KEY);
+const { sanitizeEntity } = require("strapi-utils");
+
 
 module.exports = {
   createPaymentIntent: async (ctx) => {
     const { cart } = ctx.request.body;
 
-    let games = [];
+    // simplificando dados do carrinho
+    const cartGamesIds = await strapi.config.functions.cart.cartGamesIds(cart);
 
-    await Promise.all(
-      cart.map(async (game) => {
-        const validatedGame = await strapi.services.game.findOne({
-          id: game.id,
-        });
-
-        if (validatedGame) {
-          games.push(validatedGame);
-        }
-      })
-    );
+    //get all games (dentro de config/functions/cart tem o metodo cartItems)
+    const games = await strapi.config.functions.cart.cartItems(cartGamesIds);
 
     if (!games.length) {
       ctx.response.status = 404;
@@ -26,10 +20,7 @@ module.exports = {
         error: "No valid games found!",
       };
     }
-
-    const total = games.reduce((acc, game) => {
-      return acc + game.price;
-    }, 0);
+    const total = await strapi.config.functions.cart.total(games);
 
     if (total === 0) {
       return {
@@ -39,9 +30,9 @@ module.exports = {
 
     try {
       const paymentIntent = await stripe.paymentIntents.create({
-        amount: total * 100,
+        amount: total,
         currency: "usd",
-        metadata: { integration_check: "accept_a_payment" },
+        metadata: { cart: JSON.stringify(cartGamesIds) },
       });
 
       return paymentIntent;
@@ -51,6 +42,7 @@ module.exports = {
       };
     }
   },
+
   create: async (ctx) => {
     // pegar informações do front:
     const { cart, paymentIntentId, paymentMethod } = ctx.request.body;
@@ -64,13 +56,35 @@ module.exports = {
     const userId = token.id;
 
     //recuperar informações do user
-    const userInfo = await strapi
-    .query("user", "users-permissions")
-    .findOne({id: userId});
+    const user = await strapi
+      .query("user", "users-permissions")
+      .findOne({ id: userId });
 
-    // usuario, jogos, total, paymentIntentId
-    //informações de pagamento (payment method)
-    // salvar no banco
+    // simplificando dados do carrinho
+    const cartGamesIds = await strapi.config.functions.cart.cartGamesIds(cart);
+
+    //get all games (dentro de config/functions/cart tem o metodo cartItems)
+    const games = await strapi.config.functions.cart.cartItems(cartGamesIds);
+
+    //pegar total (saber se é free ou n)
+    const total_in_cents = await strapi.config.functions.cart.total(games);
+
+    //pegar valores do paymentMethod
+
+    //salvar no banco
+    const entry = {
+     total_in_cents,
+     payment_intent_id: paymentIntentId,
+     card_brand: null,
+     card_last4: null,
+     games,
+     user
+    };
+
+    const entity = await strapi.services.order.create(entry);
+
     // enviar um email
+
+    return sanitizeEntity(entity, { model: strapi.models.order});
   }
 };
