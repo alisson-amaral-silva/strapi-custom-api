@@ -72,7 +72,7 @@ module.exports = {
     //pegar valores do paymentMethod
     let paymentInfo;
 
-    if(total_in_cents !== 0){
+    if(total_in_cents != 0){
       try {
        paymentInfo = await stripe.paymentMethod.retrieve(paymentMethod);
       }catch(e) {
@@ -85,8 +85,8 @@ module.exports = {
     const entry = {
      total_in_cents,
      payment_intent_id: paymentIntentId,
-     card_brand: paymentInfo?.card?.brand,
-     card_last4: paymentInfo?.card?.last4,
+     card_brand: paymentInfo && paymentInfo.card.brand,
+     card_last4: paymentInfo && paymentInfo.card.last4,
      games,
      user
     };
