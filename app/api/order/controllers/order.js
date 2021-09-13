@@ -51,4 +51,26 @@ module.exports = {
       };
     }
   },
+  create: async (ctx) => {
+    // pegar informações do front:
+    const { cart, paymentIntentId, paymentMethod } = ctx.request.body;
+
+    //pegar token
+    const token = await strapi.plugins[
+      "users-permissions"
+    ].services.jwt.getToken(ctx);
+
+    //pega userId
+    const userId = token.id;
+
+    //recuperar informações do user
+    const userInfo = await strapi
+    .query("user", "users-permissions")
+    .findOne({id: userId});
+
+    // usuario, jogos, total, paymentIntentId
+    //informações de pagamento (payment method)
+    // salvar no banco
+    // enviar um email
+  }
 };
