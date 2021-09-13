@@ -70,13 +70,23 @@ module.exports = {
     const total_in_cents = await strapi.config.functions.cart.total(games);
 
     //pegar valores do paymentMethod
+    let paymentInfo;
+
+    if(total_in_cents !== 0){
+      try {
+       paymentInfo = await stripe.paymentMethod.retrieve(paymentMethod);
+      }catch(e) {
+        ctx.response.status = 402;
+        return { error: e.message };
+      }
+    }
 
     //salvar no banco
     const entry = {
      total_in_cents,
      payment_intent_id: paymentIntentId,
-     card_brand: null,
-     card_last4: null,
+     card_brand: paymentInfo?.card?.brand,
+     card_last4: paymentInfo?.card?.last4,
      games,
      user
     };
