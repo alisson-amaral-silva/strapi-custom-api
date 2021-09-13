@@ -22,7 +22,7 @@ module.exports = {
     }
     const total = await strapi.config.functions.cart.total(games);
 
-    if (total === 0) {
+    if (total == 0) {
       return {
         freeGames: true,
       };
