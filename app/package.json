@@ -13,7 +13,8 @@
   "dependencies": {
     "jsdom": "^16.5.3",
     "knex": "0.95.6",
-    "pg": "8.6.0",
+    "pg": "^8.6.0",
+    "sharp": "^0.29.1",
     "slugify": "^1.5.3",
     "strapi": "3.6.2",
     "strapi-admin": "3.6.2",
@@ -22,7 +23,7 @@
     "strapi-plugin-content-manager": "3.6.2",
     "strapi-plugin-content-type-builder": "3.6.2",
     "strapi-plugin-email": "3.6.2",
-    "strapi-plugin-email-designer": "^0.4.1",
+    "strapi-plugin-email-designer": "^1.1.6",
     "strapi-plugin-entity-relationship-chart": "3.1.0",
     "strapi-plugin-graphql": "3.6.2",
     "strapi-plugin-sync-roles-permissions": "^0.4.2",

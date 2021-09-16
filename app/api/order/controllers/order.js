@@ -72,9 +72,10 @@ module.exports = {
     //pegar valores do paymentMethod
     let paymentInfo;
 
+
     if(total_in_cents != 0){
       try {
-       paymentInfo = await stripe.paymentMethod.retrieve(paymentMethod);
+       paymentInfo = await stripe.paymentMethods.retrieve(paymentMethod);
       }catch(e) {
         ctx.response.status = 402;
         return { error: e.message };
@@ -91,27 +92,30 @@ module.exports = {
      user
     };
 
-    const entity = await strapi.services.order.create(entry);
-
-    // enviar um email
-
-    await strapi.plugins.email.services.email.sendTemplatedEmail(
-      {
-        to: user.email,
-        from: "no-reply@wongames.com",
-      },
-      orderTemplate,
-      {
-        user,
-        payment: {
-          total: `$ ${total_in_cents / 100}`,
-          card_brand: entry.card_brand,
-          card_last4: entry.card_last4,
+    try {
+      // enviar um email da compra para o usuário
+      await strapi.plugins["email-designer"].services.email.sendTemplatedEmail(
+        {
+          to: user.email,
+          from: "no-reply@wongames.com",
         },
-        games,
-      }
-    );
-
-    return sanitizeEntity(entity, { model: strapi.models.order});
-  }
+        {
+          templateId: 1,
+        },
+        {
+          user: user,
+          payment: {
+            total: `$ ${total_in_cents / 100}`,
+            card_brand: entry.card_brand,
+            card_last4: entry.card_last4,
+          },
+          games,
+        }
+      );
+    }catch (err) {
+      console.log('📺: ', err);
+    }
+      // retornando que foi salvo no banco
+      return sanitizeEntity(entity, { model: strapi.models.order });
+    },
 };
