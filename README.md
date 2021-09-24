@@ -1,4 +1,4 @@
-# Api - react with Strapi
+# Api - Database
 
 ## Requirements
 
