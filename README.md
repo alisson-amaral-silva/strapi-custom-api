@@ -43,7 +43,7 @@ strapi=# \q
 If you have any problem with some dependencies you should try:
 
 ```
-yarn install
+npm install
 ```
 
 I got some problems with this docker and few dependencies and i solved:
