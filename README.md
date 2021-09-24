@@ -1,4 +1,4 @@
-# Api - Database
+# Api and Database
 
 ## Requirements
 
